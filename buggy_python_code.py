@@ -1,7 +1,7 @@
-import sys 
+import flask
+import sys
 import os
 import yaml
-import flask
 
 app = flask.Flask(__name__)
 
@@ -12,9 +12,9 @@ def index():
     url = flask.request.args.get("url")
     return fetch_website(version, url)
 
-        
+
 CONFIG = {"API_KEY": "771df488714111d39138eb60df756e6b"}
-class Person(object):
+class Person:
     def __init__(self, name):
         self.name = name
 
@@ -25,10 +25,13 @@ def print_nametag(format_string, person):
 
 def fetch_website(urllib_version, url):
     # Import the requested version (2 or 3) of urllib
-    exec(f"import urllib{urllib_version} as urllib", globals())
+    if urllib_version == "2":
+        import urllib2 as urllib
+    elif urllib_version == "3":
+        import urllib3 as urllib
     # Fetch and print the requested URL
- 
-    try: 
+
+    try:
         http = urllib.PoolManager()
         r = http.request('GET', url)
     except:
@@ -37,12 +40,13 @@ def fetch_website(urllib_version, url):
 
 def load_yaml(filename):
     stream = open(filename)
-    deserialized_data = yaml.load(stream, Loader=yaml.Loader) #deserializing data
+    deserialized_data = yaml.safe_load(stream, Loader=yaml.Loader) #deserializing data
     return deserialized_data
     
 def authenticate(password):
     # Assert that the password is correct
-    assert password == "Iloveyou", "Invalid password!"
+    if password != "Iloveyou":
+        raise Exception("Invalid password!")
     print("Successfully authenticated!")
 
 if __name__ == '__main__':
@@ -51,9 +55,9 @@ if __name__ == '__main__':
     print("2. Code injection vulnerability:")
     print("3. Yaml deserialization vulnerability:")
     print("4. Use of assert statements vulnerability:")
-    choice  = input("Select vulnerability: ")
-    if choice == "1": 
-        new_person = Person("Vickie")  
+    choice = input("Select vulnerability: ")
+    if choice == "1":
+        new_person = Person("Vickie")
         print_nametag(input("Please format your nametag: "), new_person)
     elif choice == "2":
         urlib_version = input("Choose version of urllib: ")
@@ -64,4 +68,3 @@ if __name__ == '__main__':
     elif choice == "4":
         password = input("Enter master password: ")
         authenticate(password)
-
